@@ -1,38 +1,35 @@
+"use client";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { useActionState } from "react";
+import { submitCounselingAction } from "@/actions/submit-counseling";
 
 const CounselingForm = () => {
   // 現在の日付を取得（デフォルト値用）
   const today = new Date().toISOString().split("T")[0];
 
-  // サーバーアクション
-  async function submitCounselingAction(formData: FormData) {
-    "use server";
-    // formDataから入力内容を取得
-    const name = formData.get("name");
-    const email = formData.get("email");
-    const date = formData.get("date");
-    const time = formData.get("time");
-    const goals = formData.get("goals");
-
-    // コンソール出力
-    console.log({
-      name,
-      email,
-      date,
-      time,
-      goals,
-    });
-
-    // 実際の処理はあとで追加（DBへの保存）
-  }
+  // Server Action 処理の状態を管理
+  const [state, formAction] = useActionState(submitCounselingAction, {});
 
   return (
     <div className="bg-white text-gray-800 rounded-2xl shadow-2xl overflow-hidden">
       <div className="p-8">
-        <form action={submitCounselingAction} className="space-y-6">
+        {/* エラーメッセージがある場合に表示 */}
+        {state.message && (
+          <div
+            className={`mb-4 p-3 rounded ${
+              state.success
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {state.message}
+          </div>
+        )}
+        <form action={formAction} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="name">予約名</Label>
             <Input id="name" name="name" placeholder="山田 太郎" required />
